@@ -71,10 +71,16 @@ textarea:focus{border-color:var(--gold-deep)}
   background:var(--gold);border:3px solid var(--gold-deep);
   display:flex;align-items:center;justify-content:center;
   transform-style:preserve-3d;backface-visibility:visible;
+  position:relative;
 }
 .coin span{display:block;width:19px;height:19px;background:#171310}
 .coin.back{background:#6E5320;border-color:var(--gold)}
 .coin.back span{background:#171310;box-shadow:0 0 0 2.5px var(--gold)}
+.coin::after{
+  content:attr(data-face);position:absolute;left:0;right:0;top:6px;
+  text-align:center;font-size:16px;font-weight:700;color:#171310;line-height:1;
+}
+.coin.back::after{color:var(--gold)}
 .coin.flip{animation:coinflip .44s cubic-bezier(.25,.75,.35,1)}
 @keyframes coinflip{
   0%{transform:translateY(0) rotateY(0deg)}
@@ -160,6 +166,13 @@ textarea:focus{border-color:var(--gold-deep)}
 .yao-list{margin-top:4px}
 
 /* ---------- AI 细讲 ---------- */
+.coin-list{margin:8px 0 0}
+.coin-row{font-size:14px;line-height:2;color:var(--text)}
+.coin-row .pos{color:var(--dim);margin-right:6px}
+.coin-row b{font-weight:700}
+.coin-row b.z{color:var(--gold)}
+.coin-row b.f{color:var(--dim)}
+.coin-row b.mv{color:var(--red)}
 .ai-out{margin-top:12px}
 .ai-text{white-space:pre-wrap;margin:0}
 .ai-text.busy::after{content:'▌';color:var(--gold);animation:xgblink 1s steps(1) infinite}

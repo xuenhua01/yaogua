@@ -92,6 +92,23 @@ check('水雷屯 = 第 3 卦', ben && ben.num === 3, ben && ben.name);
 const bian = X.findGua(X.bianOf([1, 0, 0, 0, 1, 0], [false, false, true, false, false, false]));
 check('屯的三爻一动就有变卦', !!bian, bian && bian.full);
 
+console.log('三枚铜钱：');
+check('正面写正、反面写反', X.faceText(3) === '正' && X.faceText(2) === '反');
+check('三个一加就是这一爻', X.coinSum([3, 3, 2]) === 8 && X.coinSum([3, 3, 3]) === 9);
+check('六七八九各有各的说法',
+  X.lineName(6) === '老阴 · 动' && X.lineName(7) === '少阳' &&
+  X.lineName(8) === '少阴' && X.lineName(9) === '老阳 · 动');
+check('一句话说清一组', X.coinText([3, 3, 2]) === '正 正 反　少阴', X.coinText([3, 3, 2]));
+check('摇出来的每一组都能说清楚', t.faces.every(function (f, i) {
+  return X.coinText(f) === X.faceText(f[0]) + ' ' + X.faceText(f[1]) + ' ' + X.faceText(f[2]) +
+    '　' + X.lineName(t.sums[i]);
+}));
+const rawCoins = X.encodeCoins(t.faces);
+check('六组存下来还是六组', X.decodeCoins(rawCoins).length === 6, rawCoins);
+check('存了再读，正反没变',
+  JSON.stringify(X.decodeCoins(rawCoins)) === JSON.stringify(t.faces));
+check('老记录没这一段也不炸', X.decodeCoins('').length === 0 && X.decodeCoins(undefined).length === 0);
+
 console.log('');
 if (failed) {
   console.log('有 ' + failed + ' 项没过');

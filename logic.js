@@ -115,11 +115,35 @@
     return lines.map(function (v, i) { return moving[i] ? 1 - v : v; });
   }
 
+  // 三枚铜钱：字面（阳）记 3，背面（阴）记 2。
+  // 三个一加就是这一爻的六七八九：六老阴（动）、七少阳、八少阴、九老阳（动）。
+  function faceText(f) { return f === 3 ? '正' : '反'; }
+  function coinSum(faces) { return faces[0] + faces[1] + faces[2]; }
+  function lineName(sum) {
+    return { 6: '老阴 · 动', 7: '少阳', 8: '少阴', 9: '老阳 · 动' }[sum] || '';
+  }
+  function coinText(faces) {
+    return faces.map(faceText).join(' ') + '　' + lineName(coinSum(faces));
+  }
+  function encodeCoins(all) {
+    return all.map(function (f) { return f.join(''); }).join(',');
+  }
+  function decodeCoins(raw) {
+    if (!raw) return [];
+    return String(raw).split(',').map(function (g) {
+      var d = g.replace(/[^23]/g, '');
+      if (d.length !== 3) return null;
+      return [d.charCodeAt(0) - 48, d.charCodeAt(1) - 48, d.charCodeAt(2) - 48];
+    }).filter(function (x) { return x; });
+  }
+
   return {
     TRIGRAM: TRIGRAM, TEND: TEND,
     findGua: findGua, byNum: byNum, extraOf: extraOf, hexOf: hexOf,
     tend: tend, tendColor: tendColor,
     civil: civil, stamp: stamp,
-    movingNames: movingNames, tossAll: tossAll, bianOf: bianOf
+    movingNames: movingNames, tossAll: tossAll, bianOf: bianOf,
+    faceText: faceText, coinSum: coinSum, lineName: lineName, coinText: coinText,
+    encodeCoins: encodeCoins, decodeCoins: decodeCoins
   };
 });

@@ -11,6 +11,8 @@
   var findGua = X.findGua, byNum = X.byNum, extraOf = X.extraOf, hexOf = X.hexOf;
   var tend = X.tend, tendColor = X.tendColor, civil = X.civil, stamp = X.stamp;
   var movingNames = X.movingNames, tossAll = X.tossAll, bianOf = X.bianOf;
+  var faceText = X.faceText, coinSum = X.coinSum, lineName = X.lineName, coinText = X.coinText;
+  var encodeCoins = X.encodeCoins, decodeCoins = X.decodeCoins;
 
   // ---------- 半仙的嘴 ----------
   var VERDICT = {
@@ -56,14 +58,29 @@
     els.forEach(function (el, i) {
       var isBack = faces[i] === 2;
       el.classList.remove('flip');
+      el.removeAttribute('data-face');
       void el.offsetWidth;
       el.classList.add('flip');
       setTimeout(function () { el.classList.toggle('back', isBack); }, 205);
       setTimeout(function () {
         el.classList.remove('flip');
+        el.setAttribute('data-face', faceText(faces[i]));
         if (--left === 0) done();
       }, 450);
     });
+  }
+
+  // 六组铜钱摆成一张清单：正反一眼看出来
+  function coinRows(faces) {
+    var pos = ['初', '二', '三', '四', '五', '上'];
+    return faces.map(function (f, i) {
+      var name = lineName(coinSum(f));
+      var cells = f.map(function (v) {
+        return '<b class="' + (v === 3 ? 'z' : 'f') + '">' + faceText(v) + '</b>';
+      }).join(' ');
+      return '<div class="coin-row"><span class="pos">' + pos[i] + '爻</span>' + cells +
+        '　<b class="' + (name.indexOf('动') >= 0 ? 'mv' : '') + '">' + name + '</b></div>';
+    }).join('');
   }
 
   var tossing = false;
@@ -96,8 +113,10 @@
       flipCoins(r.faces[i], function () {
         revealNext($('r-hex'), i);
         buzz(16);
+        // 停一下，把这一组三枚的正反摆在眼前
+        $('status').textContent = '第 ' + (i + 1) + ' 爻　' + coinText(r.faces[i]);
         i++;
-        setTimeout(next, 110);
+        setTimeout(next, 800);
       });
     })();
   }
@@ -111,12 +130,15 @@
     var bian = moving.some(Boolean) ? findGua(bianLines) : null;
 
     current = { lines: lines, moving: moving, time: tossTime, question: curQuestion, ben: ben, bian: bian };
+    current.faces = r.faces;
 
     $('coins').hidden = true;
     $('status').hidden = true;
 
     $('r-situation').textContent = curQuestion ? '眼下的境况：' + curQuestion : '眼下的境况：（心中默想）';
     $('r-time').textContent = '起卦时间　' + civil(tossTime) + '\n' + stamp(tossTime);
+    $('coin-list').innerHTML = coinRows(r.faces);
+    $('coin-block').hidden = false;
     $('r-moving').textContent = moving.some(Boolean)
       ? '关键在 ' + movingNames(lines, moving) + '　·　本卦是眼下的处境，变卦是照这条路走下去的样子'
       : '六爻安静 · 眼下没有明显的转折，照本卦的分寸来就好';
@@ -212,6 +234,14 @@
     });
     $('d-story').textContent = extra.story;
 
+    var faces = (ctx && ctx.faces) || null;
+    if (faces && faces.length) {
+      $('d-coin-list').innerHTML = coinRows(faces);
+      $('d-coin-block').hidden = false;
+    } else {
+      $('d-coin-block').hidden = true;
+    }
+
     $('btn-speak-detail').onclick = function () {
       var s = '第' + gua.num + '卦，' + gua.full + '。卦辞：' + gua.text + gua.plain;
       extra.yao.forEach(function (y) { s += y.t + '。' + y.p; });
@@ -264,7 +294,8 @@
       lines: current.lines,
       moving: current.moving,
       ben: current.ben.num,
-      bian: current.bian ? current.bian.num : 0
+      bian: current.bian ? current.bian.num : 0,
+      f: encodeCoins(current.faces || [])
     });
     while (list.length > 80) list.pop();
     try { localStorage.setItem(REC_KEY, JSON.stringify(list)); } catch (e) {}
@@ -286,7 +317,10 @@
         '<div class="li-sub">' + (r.q || '（未写所问）') + '</div>' +
         '</div>';
       li.onclick = function () {
-        openDetail(r.ben, { time: new Date(r.t), question: r.q, lines: r.lines, moving: r.moving });
+        openDetail(r.ben, {
+          time: new Date(r.t), question: r.q, lines: r.lines, moving: r.moving,
+          faces: decodeCoins(r.f)
+        });
       };
       ul.appendChild(li);
     });
@@ -316,6 +350,13 @@
     var b = current.ben, s = '';
     if (current.question) s += '眼下的境况：' + current.question + '\n\n';
     s += '起卦时间：' + civil(current.time) + '\n' + stamp(current.time) + '\n\n';
+    if (current.faces && current.faces.length) {
+      s += '三枚铜钱：\n';
+      current.faces.forEach(function (f, i) {
+        s += ['初', '二', '三', '四', '五', '上'][i] + '爻　' + coinText(f) + '\n';
+      });
+      s += '\n';
+    }
     s += '【本卦】第' + b.num + '卦　' + b.full + '\n卦辞：' + b.text +
       '\n此象：' + tend(b.luck) + '\n' + b.plain + '\n';
     if (current.bian) {
@@ -643,7 +684,7 @@
     if (!current) return;
     openDetail(current.ben.num, {
       time: current.time, question: current.question,
-      lines: current.lines, moving: current.moving
+      lines: current.lines, moving: current.moving, faces: current.faces
     });
   };
   $('btn-share').onclick = shareResult;
