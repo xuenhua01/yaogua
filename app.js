@@ -16,18 +16,69 @@
 
   // ---------- 半仙的嘴 ----------
   var VERDICT = {
-    '大吉': '卦都这么给面子了，你自己别掉链子。',
-    '吉': '路子是通的，剩下的靠腿。',
-    '凶': '卦说了句实话，你别嫌难听。'
+    '大吉': [
+      '卦都这么给面子了，你自己别掉链子。',
+      '这一卦通得很，唯一挡路的是你还在犹豫。',
+      '天时不错，剩下看你怎么走——走快点。',
+      '好卦配好腿，别坐着等它自己成。'
+    ],
+    '吉': [
+      '路子是通的，剩下的靠腿。',
+      '不好不坏偏一点好，属于可以下手的那种。',
+      '卦给了绿灯，但没给你修路。',
+      '这一象挺顺，就是别贪心加码。'
+    ],
+    '凶': [
+      '卦说了句实话，你别嫌难听。',
+      '这一象在劝你：先别急着往前冲。',
+      '路是堵的，绕一绕比硬闯强。',
+      '不是没戏，是时候不对，别跟它较劲。'
+    ],
+    '中平': [
+      '不好不坏，全看你怎么走。',
+      '中不溜的一卦，属于你自己说了算。',
+      '这卦没表态，意思是让你自己定。',
+      '平平一笔，成不成在两可之间。'
+    ]
   };
   var ASIDE = [
     '铜钱有点滑，别急', '掐指一算，指头有点酸', '正在跟老天爷对表',
     '这一爻有点沉', '半仙的胡子抖了一下', '替天行道中，稍等',
     '别催，天机也在排队', '这枚铜钱转得有点久', '念念有词，其实在背卦辞',
-    '别出声，怕惊着它'
+    '别出声，怕惊着它', '铜钱说它今天心情不错', '正在翻那本很厚的书',
+    '这一手是祖传的，别问是第几代', '刚跟隔壁土地公打了个招呼',
+    '手别抖，卦象也跟着抖', '烧的香有点潮，火苗歪了',
+    '天机不可泄露，所以我先不看', '这卦有脾气，得哄',
+    '铜钱落地前，先落我的话', '半仙今天没吃早饭，但卦照看',
+    '你的事我记下了，再等一爻', '数着呢，就差三下',
+    '这爻要是动了，可别怪我', '别眨眼，眨了就换一个结果（骗你的）'
   ];
+  var COIN_MOVING = [
+    '这爻沉，动了', '有意思，这一枚不肯平', '动爻，记着这一笔',
+    '这位置最热闹', '翻了个身，事情要转弯'
+  ];
+  var COIN_STILL = [
+    '安安静静，不折腾', '这爻没脾气', '老老实实躺着',
+    '不算热闹，也省心', '稳稳的，接着来'
+  ];
+  var AI_THINKING = [
+    '半仙正在掐指，边想边写…', '翻书呢，别催…', '这段话得斟酌，稍等…',
+    '正在把这卦跟你的事对上…', '先别急，字一个一个蹦出来…'
+  ];
+  var AI_TAIL = [
+    '这段是接口现查的，不是卦书里的话，看着乐。',
+    'AI 顺着你这卦说的，听听就得，别当命令。',
+    '这属于半仙的即兴发挥，参考一半，剩下一半靠你。'
+  ];
+  var EMPTY_RECORDS = [
+    '半仙还没开张，去起一卦吧。',
+    '这儿空着，说明你今天还没心事。',
+    '一条记录都没有——要么你没问，要么你心里早有数。'
+  ];
+  var COPY_OK = ['复制好了，拿去用。', '抄走了，随便发。'];
   function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
-  function verdict(l) { return VERDICT[l] || '不好不坏，全看你怎么走。'; }
+  function verdict(l) { return pick(VERDICT[l] || VERDICT['中平']); }
+  function coinQuip(moving) { return pick(moving ? COIN_MOVING : COIN_STILL); }
 
   // ---------- 卦象渲染 ----------
   function renderHex(box, lines, moving, revealed) {
@@ -114,7 +165,8 @@
         revealNext($('r-hex'), i);
         buzz(16);
         // 停一下，把这一组三枚的正反摆在眼前
-        $('status').textContent = '第 ' + (i + 1) + ' 爻　' + coinText(r.faces[i]);
+        $('status').textContent = '第 ' + (i + 1) + ' 爻　' + coinText(r.faces[i]) +
+          '　·　' + coinQuip(r.moving[i]);
         i++;
         setTimeout(next, 800);
       });
@@ -305,6 +357,7 @@
     var list = loadRecords();
     var ul = $('record-list');
     ul.innerHTML = '';
+    $('records-empty').textContent = pick(EMPTY_RECORDS);
     $('records-empty').hidden = list.length > 0;
     $('btn-clear').hidden = list.length === 0;
     list.forEach(function (r) {
@@ -504,7 +557,7 @@
       followGo.disabled = true;
       show('');
       textEl.className = 'ai-text body-text busy';
-      note(followUp ? '追问中…' : '半仙正在掐指，边想边写…');
+      note(followUp ? '追问中，半仙在翻上一段…' : pick(AI_THINKING));
 
       AI.chat(cfg, msgs, function (d) { textEl.textContent += d; })
         .then(function (full) {
@@ -523,7 +576,7 @@
             followEl.value = '';
             note('');
           } else {
-            note('这段是接口现查的，不是卦书里的话，看着乐。');
+            note(pick(AI_TAIL));
             AI.cachePut(cacheKey, text);
           }
           outBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -542,7 +595,7 @@
     box.querySelector('.ai-copy').onclick = function () {
       if (!last) return;
       if (navigator.clipboard) {
-        navigator.clipboard.writeText(last).then(function () { toast('复制好了'); },
+        navigator.clipboard.writeText(last).then(function () { toast(pick(COPY_OK)); },
           function () { toast('这个浏览器不让复制'); });
       } else {
         toast('这个浏览器不让复制');

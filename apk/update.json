@@ -1,7 +1,7 @@
 {
-    "versionCode":  3,
-    "versionName":  "1.2",
-    "apkUrl":  "https://xuenhua01.github.io/yaogua/apk/yaogua-1.2.apk",
-    "notes":  "加了「半仙细说」：摇完卦点一下，它就对着你写的那件事现说一段更细的，\n还能接着追问，像聊天一样。用哪家模型在「AI 设置」里选，填个 Key 就行，\n默认那家是免费的。",
+    "versionCode":  4,
+    "versionName":  "1.3",
+    "apkUrl":  "https://xuenhua01.github.io/yaogua/apk/yaogua-1.3.apk",
+    "notes":  "半仙的嘴更碎了：起卦时碎碎念、铜钱落定点评一句、结果多备了好几句，\n同一档卦不重样。另外修了摇卦时看不清铜钱正反的问题。",
     "force":  false
 }
