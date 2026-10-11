@@ -26,6 +26,7 @@
         <h1>徐 半 仙 算 卦</h1>
         <p>六十四卦 · 六十四种处境 · 遇事借它理一理</p>
       </div>
+      <button id="btn-ai-cfg" class="gear">AI 设置</button>
     </header>
 
     <label class="field">
@@ -67,6 +68,8 @@
         <h3 class="mini-title">下一步怎么走</h3>
         <p id="b-plain" class="body-text"></p>
       </div>
+
+      <div id="ai-mount-result"></div>
 
       <hr class="rule">
       <div class="row">
@@ -153,6 +156,8 @@
     <h3 class="section-title">典 故 轶 闻 · 本卦</h3>
     <div class="card"><p id="d-story" class="body-text"></p></div>
 
+    <div id="ai-mount-detail"></div>
+
     <div class="row">
       <button id="btn-speak-detail" class="btn ghost">朗读全卦</button>
       <button id="btn-close-detail" class="btn primary">返回</button>
@@ -160,8 +165,52 @@
   </div>
 </div>
 
+<!-- ============ AI 设置 ============ -->
+<div id="ai-cfg" class="sheet" hidden>
+  <div class="sheet-inner">
+    <button id="btn-cfg-back" class="back">← 返回</button>
+    <h2 class="page-title">AI 细讲 · 设置</h2>
+    <p class="page-sub">填一次存在这台设备上，换设备要重填。密钥只发给你自己选的这家接口。</p>
+
+    <label class="field">
+      用哪家
+      <select id="cfg-preset"></select>
+    </label>
+    <p class="hint" id="cfg-preset-hint"></p>
+
+    <label class="field">
+      接口地址
+      <input id="cfg-base" type="url" spellcheck="false" autocapitalize="off" autocomplete="off">
+    </label>
+    <label class="field">
+      模型名
+      <input id="cfg-model" type="text" spellcheck="false" autocapitalize="off" autocomplete="off">
+    </label>
+    <label class="field">
+      API Key
+      <input id="cfg-key" type="password" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder="粘进来，只存在本机">
+    </label>
+
+    <div class="row">
+      <button id="cfg-save" class="btn primary">保存</button>
+      <button id="cfg-test" class="btn ghost">试一句</button>
+    </div>
+    <div class="row">
+      <button id="cfg-clear" class="btn ghost">忘掉本机存的密钥</button>
+    </div>
+    <p class="hint" id="cfg-status"></p>
+
+    <h3 class="section-title">去哪儿拿 Key（不花钱的走法）</h3>
+    <p class="hint">智谱开放平台：注册 + 实名，建一个 API Key 贴上来。模型名用默认的 glm-4.7-flash，官方写着这一档免费，不用充钱。</p>
+    <p class="hint">硅基流动也行：注册送额度，模型广场里挑标着「免费」的小模型，名字整条复制到上面。</p>
+    <p class="hint">豆包（火山方舟）同一个填法，但豆包是要花钱的——新号送的额度用完就开始计费，所以默认没选它。</p>
+    <p class="hint">密钥就躺在这台设备的浏览器里，别在别人的手机上填。</p>
+  </div>
+</div>
+
 <script src="data.js"></script>
 <script src="logic.js"></script>
+<script src="ai.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

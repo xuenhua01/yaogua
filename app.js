@@ -143,6 +143,7 @@
     $('result').hidden = false;
     $('btn-toss').disabled = false;
     $('btn-again').disabled = false;
+    resultPanel.reset();
     saveRecord();
     setTimeout(function () {
       $('result').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -156,6 +157,13 @@
     var moving = (ctx && ctx.moving) || [false, false, false, false, false, false];
     var extra = extraOf(gua.name);
     var names = movingNames(lines, moving);
+
+    detailCtx = {
+      gua: gua, lines: lines, moving: moving,
+      question: (ctx && ctx.question) || '',
+      time: (ctx && ctx.time) || null
+    };
+    detailPanel.reset();
 
     $('d-title').textContent = '第 ' + gua.num + ' 卦　' + gua.full;
     var sub = '上卦 ' + gua.upper + '　下卦 ' + gua.lower;
@@ -222,6 +230,7 @@
   }
 
   var detailOpen = false;
+  var detailCtx = null;
   function closeDetail() {
     $('detail').hidden = true;
     detailOpen = false;
@@ -339,6 +348,281 @@
     clearTimeout(toastTimer);
     toastTimer = setTimeout(function () { el.style.opacity = '0'; }, 1800);
   }
+
+  // ---------- AI 细讲 ----------
+  var AI = window.XGAI;
+
+  /** 把一次起卦整理成给模型看的材料。 */
+  function aiInput(gua, lines, moving, question, time) {
+    if (!gua) return null;
+    var names = movingNames(lines, moving);
+    var extra = extraOf(gua.name);
+    var yao = [];
+    if (names) {
+      for (var i = 0; i < 6; i++) {
+        if (!moving[i]) continue;
+        var y = extra.yao[i] || { t: '第' + (i + 1) + '爻', p: '' };
+        yao.push({ t: y.t, p: y.p });
+      }
+    }
+    var bianGua = names ? findGua(bianOf(lines, moving)) : null;
+    return {
+      question: question || '',
+      when: time ? civil(time) + ' ' + stamp(time) : '',
+      ben: {
+        num: gua.num, full: gua.full, upper: gua.upper, lower: gua.lower,
+        text: gua.text, luckText: tend(gua.luck), plain: gua.plain
+      },
+      movingNames: names,
+      movingYao: yao,
+      bian: bianGua
+        ? { num: bianGua.num, full: bianGua.full, text: bianGua.text, plain: bianGua.plain }
+        : null
+    };
+  }
+
+  /** 挂一块「半仙细说」，ctxFn 负责说清眼下讲的是哪一卦。 */
+  function makeAIPanel(mountId, ctxFn) {
+    var box = $(mountId);
+    if (!box) return { reset: function () {} };
+
+    box.innerHTML =
+      '<hr class="rule">' +
+      '<h3 class="section-title">半 仙 细 说 · AI</h3>' +
+      '<p class="hint">上面是简版。想听它对着你这件具体的事多说几句，点下面。</p>' +
+      '<button class="btn ghost ai-go">细说一盘</button>' +
+      '<div class="ai-out" hidden>' +
+        '<p class="ai-text body-text"></p>' +
+        '<div class="row">' +
+          '<button class="btn ghost ai-copy">复制</button>' +
+          '<button class="btn ghost ai-speak">念一遍</button>' +
+          '<button class="btn ghost ai-redo">再说一遍</button>' +
+        '</div>' +
+        '<div class="ai-follow-row">' +
+          '<input class="ai-follow" type="text" placeholder="还想追问一句…" spellcheck="false">' +
+          '<button class="btn ghost ai-follow-go">问</button>' +
+        '</div>' +
+      '</div>' +
+      '<p class="ai-note hint"></p>';
+
+    var goBtn = box.querySelector('.ai-go');
+    var outBox = box.querySelector('.ai-out');
+    var textEl = box.querySelector('.ai-text');
+    var noteEl = box.querySelector('.ai-note');
+    var followEl = box.querySelector('.ai-follow');
+    var followGo = box.querySelector('.ai-follow-go');
+    var busy = false;
+    var last = '';
+
+    function note(msg, bad) {
+      noteEl.textContent = msg || '';
+      noteEl.className = 'ai-note hint' + (bad ? ' bad' : '');
+    }
+    function show(text) {
+      last = text;
+      outBox.hidden = false;
+      textEl.textContent = text;
+    }
+    function reset() {
+      if (busy) return;
+      last = '';
+      outBox.hidden = true;
+      textEl.textContent = '';
+      followEl.value = '';
+      note('');
+    }
+    function run(followUp, force) {
+      if (busy) return;
+      var ctx = ctxFn();
+      if (!ctx) return;
+      var cfg = AI.readCfg();
+      if (!AI.ready(cfg)) {
+        toast('先去右上角「AI 设置」把 Key 填上');
+        openAiCfg();
+        return;
+      }
+
+      var cacheKey = AI.cacheKey(ctx);
+      if (!followUp && !force) {
+        var hit = AI.cacheGet(cacheKey);
+        if (hit) {
+          show(hit);
+          note('这段是本机存过的，没再费额度。');
+          return;
+        }
+      }
+
+      var msgs = AI.buildMessages(ctx);
+      if (followUp) {
+        msgs.push({ role: 'assistant', content: last });
+        msgs.push({ role: 'user', content: followUp });
+      }
+
+      busy = true;
+      goBtn.disabled = true;
+      followGo.disabled = true;
+      show('');
+      textEl.className = 'ai-text body-text busy';
+      note(followUp ? '追问中…' : '半仙正在掐指，边想边写…');
+
+      AI.chat(cfg, msgs, function (d) { textEl.textContent += d; })
+        .then(function (full) {
+          busy = false;
+          goBtn.disabled = false;
+          followGo.disabled = false;
+          textEl.className = 'ai-text body-text';
+          var text = (full || '').trim() || textEl.textContent.trim();
+          if (!text) {
+            show('');
+            note('它一个字都没说，再点一次试试。', true);
+            return;
+          }
+          show(text);
+          if (followUp) {
+            followEl.value = '';
+            note('');
+          } else {
+            note('这段是接口现查的，不是卦书里的话，看着乐。');
+            AI.cachePut(cacheKey, text);
+          }
+          outBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        })
+        .catch(function (err) {
+          busy = false;
+          goBtn.disabled = false;
+          followGo.disabled = false;
+          textEl.className = 'ai-text body-text';
+          note((err && err.message) || '没成，再试一次。', true);
+        });
+    }
+
+    goBtn.onclick = function () { run('', false); };
+    box.querySelector('.ai-redo').onclick = function () { run('', true); };
+    box.querySelector('.ai-copy').onclick = function () {
+      if (!last) return;
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(last).then(function () { toast('复制好了'); },
+          function () { toast('这个浏览器不让复制'); });
+      } else {
+        toast('这个浏览器不让复制');
+      }
+    };
+    box.querySelector('.ai-speak').onclick = function () { if (last) speak(last); };
+    followGo.onclick = function () {
+      var q = followEl.value.trim();
+      if (!q) { toast('问什么就写什么'); return; }
+      run(q, false);
+    };
+    followEl.onkeydown = function (e) {
+      if (e.key === 'Enter') followGo.onclick();
+    };
+
+    return { reset: reset };
+  }
+
+  // ---------- AI 设置 ----------
+  var cfgSheet = $('ai-cfg');
+  var cfgPreset = $('cfg-preset');
+  var cfgBase = $('cfg-base');
+  var cfgModel = $('cfg-model');
+  var cfgKey = $('cfg-key');
+  var cfgHint = $('cfg-preset-hint');
+  var cfgStatus = $('cfg-status');
+
+  AI.PRESETS.forEach(function (p) {
+    var o = document.createElement('option');
+    o.value = p.id;
+    o.textContent = p.label;
+    cfgPreset.appendChild(o);
+  });
+
+  function cfgFromForm() {
+    return {
+      preset: cfgPreset.value,
+      base: cfgBase.value.trim().replace(/\/+$/, ''),
+      model: cfgModel.value.trim(),
+      key: cfgKey.value.trim()
+    };
+  }
+
+  function openAiCfg() {
+    var cfg = AI.readCfg();
+    cfgPreset.value = cfg.preset;
+    cfgBase.value = cfg.base;
+    cfgModel.value = cfg.model;
+    cfgKey.value = cfg.key;
+    cfgHint.textContent = AI.presetOf(cfg.preset).hint || '';
+    cfgStatus.textContent = '';
+    cfgStatus.className = 'hint';
+    cfgSheet.hidden = false;
+    cfgSheet.scrollTop = 0;
+  }
+
+  function closeAiCfg() { cfgSheet.hidden = true; }
+
+  cfgPreset.onchange = function () {
+    var p = AI.presetOf(cfgPreset.value);
+    cfgHint.textContent = p.hint || '';
+    if (p.base) cfgBase.value = p.base;
+    if (p.model) cfgModel.value = p.model;
+  };
+
+  $('cfg-save').onclick = function () {
+    var cfg = cfgFromForm();
+    AI.writeCfg(cfg);
+    cfgBase.value = cfg.base;
+    cfgStatus.className = 'hint';
+    cfgStatus.textContent = AI.ready(cfg)
+      ? '存好了，可以去细说了。'
+      : '存了，但地址 / 模型 / Key 还差一样，缺了没法用。';
+    toast('存好了');
+  };
+
+  $('cfg-clear').onclick = function () {
+    AI.clearCfg();
+    cfgKey.value = '';
+    cfgStatus.className = 'hint';
+    cfgStatus.textContent = '密钥已经从这台设备上抹掉了。';
+  };
+
+  $('cfg-test').onclick = function () {
+    var cfg = cfgFromForm();
+    if (!AI.ready(cfg)) {
+      cfgStatus.className = 'hint';
+      cfgStatus.textContent = '三样都填上才能试。';
+      return;
+    }
+    AI.writeCfg(cfg);
+    var got = '';
+    cfgStatus.className = 'hint';
+    cfgStatus.textContent = '正在试…';
+    AI.chat(cfg, [{ role: 'user', content: '用一句话说说《周易》屯卦讲的是什么。' }],
+      function (d) {
+        got += d;
+        cfgStatus.textContent = '通了：' + got;
+      })
+      .then(function (full) {
+        cfgStatus.textContent = '通了：' + ((full || '').trim() || got);
+      })
+      .catch(function (err) {
+        cfgStatus.className = 'hint bad';
+        cfgStatus.textContent = (err && err.message) || '没通，检查一下地址和 Key。';
+      });
+  };
+
+  $('btn-ai-cfg').onclick = openAiCfg;
+  $('btn-cfg-back').onclick = closeAiCfg;
+
+  var resultPanel = makeAIPanel('ai-mount-result', function () {
+    return current
+      ? aiInput(current.ben, current.lines, current.moving, current.question, current.time)
+      : null;
+  });
+  var detailPanel = makeAIPanel('ai-mount-detail', function () {
+    return detailCtx
+      ? aiInput(detailCtx.gua, detailCtx.lines, detailCtx.moving, detailCtx.question, detailCtx.time)
+      : null;
+  });
 
   // ---------- 页签 ----------
   function switchView(id) {

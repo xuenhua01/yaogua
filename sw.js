@@ -1,10 +1,11 @@
 /* 网络优先，断网回落到缓存。
    网络优先是为了让网页永远是线上最新的一版，而不是被缓存钉死。 */
-var CACHE = 'xubanxian-v1';
+var CACHE = 'xubanxian-v2';
 var SHELL = [
-  './', './index.html', './app.css', './app.js', './data.js',
+  './', './index.html', './app.css', './app.js', './ai.js', './data.js', './logic.js',
   './manifest.webmanifest', './icons/icon.svg', './icons/icon-180.png'
 ];
+// 注意：AI 那段是现拉的，不进缓存；service worker 只认 GET，POST 一律放行。
 
 self.addEventListener('install', function (e) {
   e.waitUntil(
