@@ -81,6 +81,11 @@ if ($exists) {
 # ---------- 3. commit and push ----------
 Push-Location $SiteDir
 try {
+    # Native git writes ordinary progress/hints to stderr; with the global
+    # ErrorActionPreference=Stop PowerShell would treat that as fatal. Relax it
+    # here and check exit codes explicitly instead.
+    $ErrorActionPreference = 'Continue'
+
     if (-not (Test-Path (Join-Path $SiteDir '.git'))) {
         & $git init -b main | Out-Null
     }
@@ -95,7 +100,10 @@ try {
 
     $remote = "https://github.com/$login/$RepoName.git"
     $pushUrl = "https://$login`:$token@github.com/$login/$RepoName.git"
-    & $git remote remove origin 2>$null | Out-Null
+    $existingRemotes = & $git remote 2>&1
+    if ($existingRemotes -contains 'origin') {
+        & $git remote remove origin 2>&1 | Out-Null
+    }
     & $git remote add origin $remote
     Write-Host "Pushing..."
     & $git push -q -u $pushUrl main --force
@@ -103,6 +111,7 @@ try {
     Write-Host "Pushed to $remote"
 }
 finally {
+    $ErrorActionPreference = 'Stop'
     Pop-Location
 }
 
