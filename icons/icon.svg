@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108" width="512" height="512">
+  <rect width="108" height="108" fill="#1B1512"/>
+
+  <!-- 淡淡的八卦盘刻痕 -->
+  <circle cx="54" cy="54" r="36" fill="none" stroke="#D4AF37" stroke-opacity=".22" stroke-width="1.4"/>
+  <circle cx="54" cy="54" r="31" fill="none" stroke="#D4AF37" stroke-opacity=".12" stroke-width="1"/>
+
+  <!-- 斗笠 -->
+  <path fill="#D4AF37" d="M54,24 C47,30 40.5,36 34.5,41.5 L73.5,41.5 C67.5,36 61,30 54,24 Z"/>
+  <path fill="#B8952B" d="M30.5,41 L77.5,41 A2.6,2.6 0 0 1 80.1,43.6 A2.6,2.6 0 0 1 77.5,46.2 L30.5,46.2 A2.6,2.6 0 0 1 27.9,43.6 A2.6,2.6 0 0 1 30.5,41 Z"/>
+
+  <!-- 头 -->
+  <circle cx="54" cy="54" r="13.5" fill="#D4AF37"/>
+
+  <!-- 墨镜 -->
+  <rect x="42.5" y="48.6" width="10.5" height="7" rx="1.6" fill="#171310"/>
+  <rect x="55" y="48.6" width="10.5" height="7" rx="1.6" fill="#171310"/>
+  <rect x="53" y="50" width="2" height="2.2" fill="#171310"/>
+  <path fill="#EDE3D0" fill-opacity=".35" d="M45,50.4 L47.6,50.4 L45.2,54.2 L43.4,54.2 Z"/>
+  <path fill="#EDE3D0" fill-opacity=".35" d="M57.6,50.4 L60.2,50.4 L57.8,54.2 L56,54.2 Z"/>
+
+  <!-- 八字胡 -->
+  <path fill="#171310" d="M53.5,59 C49,57.8 44,59 40.5,62.8 C45,62 49.6,61.4 53.5,61.8 Z"/>
+  <path fill="#171310" d="M54.5,59 C59,57.8 64,59 67.5,62.8 C63,62 58.4,61.4 54.5,61.8 Z"/>
+
+  <!-- 道袍 -->
+  <path fill="#D4AF37" d="M54,67 C44,67 35.5,73 33,82 L75,82 C72.5,73 64,67 54,67 Z"/>
+  <path fill="#171310" d="M47,67.4 L54,75 L61,67.4 L59.4,66.8 L54,72 L48.6,66.8 Z"/>
+
+  <!-- 胸前铜钱 -->
+  <circle cx="54" cy="75" r="5" fill="#E05545"/>
+  <rect x="51.9" y="72.9" width="4.2" height="4.2" fill="#1B1512"/>
+</svg>

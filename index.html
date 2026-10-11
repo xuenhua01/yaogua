@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<title>徐半仙算卦</title>
+<meta name="theme-color" content="#12100E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="徐半仙算卦">
+<meta name="description" content="六十四卦不是预言，是古人归纳的六十四种处境。">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- ============ 起卦 ============ -->
+  <main class="view" id="view-shake">
+    <header class="brand">
+      <img src="icons/icon.svg" alt="" class="brand-icon">
+      <div>
+        <h1>徐 半 仙 算 卦</h1>
+        <p>六十四卦 · 六十四种处境 · 遇事借它理一理</p>
+      </div>
+    </header>
+
+    <label class="field">
+      <textarea id="question" rows="2" placeholder="说说你眼下遇到的事（可留空）"></textarea>
+    </label>
+
+    <button id="btn-toss" class="btn primary big">起 卦</button>
+
+    <div id="coins" class="coins" hidden>
+      <div class="coin"><span></span></div>
+      <div class="coin"><span></span></div>
+      <div class="coin"><span></span></div>
+    </div>
+
+    <p id="status" class="status" hidden></p>
+
+    <section id="result" class="card result" hidden>
+      <p id="r-situation" class="line-main"></p>
+      <p id="r-time" class="line-dim small"></p>
+      <p id="r-moving" class="line-dim small"></p>
+
+      <div id="r-hex" class="hex"></div>
+      <p id="r-name" class="gua-name"></p>
+      <p id="r-luck" class="gua-luck"></p>
+      <p id="r-quip" class="quip"></p>
+
+      <p id="r-ci" class="body-text"></p>
+      <h3 class="mini-title">下一步怎么走</h3>
+      <p id="r-plain" class="body-text"></p>
+
+      <div id="bian-block" hidden>
+        <hr class="rule">
+        <h3 class="section-title">变 卦 · 这条路走下去的样子</h3>
+        <p class="hint">本卦是你眼下的处境，变卦是照现在这个走法，事情会变成的样子。</p>
+        <div id="b-hex" class="hex small"></div>
+        <p id="b-name" class="gua-name"></p>
+        <p id="b-luck" class="gua-luck"></p>
+        <p id="b-ci" class="body-text"></p>
+        <h3 class="mini-title">下一步怎么走</h3>
+        <p id="b-plain" class="body-text"></p>
+      </div>
+
+      <hr class="rule">
+      <div class="row">
+        <button id="btn-speak" class="btn ghost">听 卦</button>
+        <button id="btn-detail" class="btn ghost">六爻详解</button>
+      </div>
+      <div class="row">
+        <button id="btn-again" class="btn primary">再起一卦</button>
+        <button id="btn-share" class="btn ghost">分享此卦</button>
+      </div>
+    </section>
+
+    <p class="footnote">六十四卦不是预言，是古人归纳的六十四种处境。<br>半仙只管起卦，路还得你自己走。</p>
+  </main>
+
+  <!-- ============ 卦典 ============ -->
+  <main class="view" id="view-book" hidden>
+    <h2 class="page-title">卦 典</h2>
+    <p class="page-sub">古人归纳的六十四种处境 · 每种怎么看、怎么办</p>
+    <ul id="book-list" class="list"></ul>
+  </main>
+
+  <!-- ============ 记录 ============ -->
+  <main class="view" id="view-records" hidden>
+    <div class="page-head">
+      <h2 class="page-title">起卦记录</h2>
+      <button id="btn-clear" class="link">清空</button>
+    </div>
+    <p class="page-sub">点任意一条，回看当时认下的处境</p>
+    <p id="records-empty" class="empty" hidden>半仙还没开张，去起一卦吧。</p>
+    <ul id="record-list" class="list"></ul>
+  </main>
+
+  <nav class="tabbar">
+    <button class="tab active" data-view="view-shake">
+      <svg viewBox="0 0 24 24"><path d="M12 2.5a9.5 9.5 0 1 0 .01 0zM9 9h6v6H9z" fill-rule="evenodd"/></svg>
+      <span>起卦</span>
+    </button>
+    <button class="tab" data-view="view-book">
+      <svg viewBox="0 0 24 24"><path d="M4 3.5h16V6H4zM4 8.5h10V11H4zM16.5 8.5H20V11h-3.5zM4 13.5h16V16H4zM4 18.5h10V21H4z"/></svg>
+      <span>卦典</span>
+    </button>
+    <button class="tab" data-view="view-records">
+      <svg viewBox="0 0 24 24"><path d="M2.5 12a9.5 9.5 0 1 0 .01 0zM4.5 12a7.5 7.5 0 1 0 .01 0z" fill-rule="evenodd"/><path d="M11 6.5h2v5.7l3.4 1.9-1 1.8-4.4-2.5z"/></svg>
+      <span>记录</span>
+    </button>
+  </nav>
+</div>
+
+<!-- ============ 详解页 ============ -->
+<div id="detail" class="sheet" hidden>
+  <div class="sheet-inner">
+    <button id="btn-back" class="back">← 返回</button>
+    <h2 id="d-title" class="page-title"></h2>
+    <p id="d-sub" class="page-sub"></p>
+    <div id="d-hex" class="hex"></div>
+    <p id="d-moving" class="gua-luck"></p>
+
+    <div class="card">
+      <p id="d-luck" class="gua-luck"></p>
+      <p id="d-ci" class="body-text"></p>
+      <h3 class="mini-title">下一步怎么走</h3>
+      <p id="d-plain" class="body-text"></p>
+    </div>
+
+    <div id="d-bian-block" hidden>
+      <h3 class="section-title">变 卦 · 照这条路走下去的样子</h3>
+      <p class="hint">本卦是你眼下的处境，变卦是照现在这个走法，事情会变成的样子。</p>
+      <div id="d-bhex" class="hex small"></div>
+      <p id="d-bname" class="gua-name"></p>
+      <p id="d-bluck" class="gua-luck"></p>
+      <div class="card">
+        <p id="d-bci" class="body-text"></p>
+        <h3 class="mini-title">下一步怎么走</h3>
+        <p id="d-bplain" class="body-text"></p>
+      </div>
+      <button id="btn-bian-detail" class="btn ghost">看变卦的六爻详解</button>
+    </div>
+
+    <h3 class="section-title">本 卦 六 爻 详 解</h3>
+    <p id="d-yao-hint" class="hint"></p>
+    <div id="d-yao" class="yao-list"></div>
+
+    <h3 class="section-title">典 故 轶 闻 · 本卦</h3>
+    <div class="card"><p id="d-story" class="body-text"></p></div>
+
+    <div class="row">
+      <button id="btn-speak-detail" class="btn ghost">朗读全卦</button>
+      <button id="btn-close-detail" class="btn primary">返回</button>
+    </div>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script src="logic.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
