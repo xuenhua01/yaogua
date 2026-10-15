@@ -1,0 +1,18 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+  <Dialog id="bookDialog" title="{dialog>/heading}" contentWidth="24rem">
+    <content>
+      <VBox class="sapUiSmallMargin">
+        <Label text="书名" labelFor="bookTitle"/>
+        <Input id="bookTitle" value="{dialog>/title}"/>
+        <Label text="作者" labelFor="bookAuthor"/>
+        <Input id="bookAuthor" value="{dialog>/author}"/>
+      </VBox>
+    </content>
+    <beginButton>
+      <Button text="保存" type="Emphasized" press=".onSave"/>
+    </beginButton>
+    <endButton>
+      <Button text="取消" press=".onCancel"/>
+    </endButton>
+  </Dialog>
+</core:FragmentDefinition>

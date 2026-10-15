@@ -1,0 +1,81 @@
+<mvc:View
+  controllerName="demo.controller.Template"
+  xmlns:mvc="sap.ui.core.mvc"
+  xmlns="sap.m">
+  <Page
+    id="templatePage"
+    title="Fiori 模板"
+    showNavButton="true"
+    navButtonPress=".onNavBack"
+    class="demoTemplate">
+    <content>
+      <IconTabBar
+        id="functionTabs"
+        selectedKey="query"
+        expandable="false"
+        applyContentPadding="false"
+        backgroundDesign="Transparent"
+        headerBackgroundDesign="Solid"
+        class="demoTabs">
+        <items>
+          <IconTabFilter key="query" text="报表查询" icon="sap-icon://search">
+            <VBox class="demoReportWrap">
+              <VBox class="demoCard">
+                <HBox class="demoFilters" alignItems="End" wrap="Wrap">
+                  <VBox>
+                    <Label text="书名或作者" labelFor="q"/>
+                    <Input id="q" placeholder="输入关键字" submit=".onQuery" width="16rem"/>
+                  </VBox>
+                  <Button text="查询" type="Emphasized" press=".onQuery"/>
+                </HBox>
+                <HBox class="demoMeta" justifyContent="SpaceBetween" alignItems="Center">
+                  <Title text="书籍" level="H4"/>
+                  <Text id="count" text="加载中…" class="demoCount"/>
+                </HBox>
+                <Table
+                  id="reportTable"
+                  items="{
+                    path: '/Books',
+                    sorter: { path: 'ID' }
+                  }"
+                  noDataText="没有符合条件的书籍"
+                  updateFinished=".onTableUpdate">
+                  <columns>
+                    <Column width="5rem"><header><Text text="ID"/></header></Column>
+                    <Column><header><Text text="书名"/></header></Column>
+                    <Column><header><Text text="作者"/></header></Column>
+                  </columns>
+                  <items>
+                    <ColumnListItem>
+                      <cells>
+                        <Text text="{ID}" class="demoId"/>
+                        <Text text="{title}"/>
+                        <Text text="{author}"/>
+                      </cells>
+                    </ColumnListItem>
+                  </items>
+                </Table>
+              </VBox>
+            </VBox>
+          </IconTabFilter>
+          <IconTabFilter id="insertTab" key="insert" text="插入" icon="sap-icon://add">
+            <VBox class="demoReportWrap">
+              <VBox class="demoCard">
+                <VBox class="demoForm">
+                  <Title text="插入一本书" level="H4"/>
+                  <Label text="ID" labelFor="bookId"/>
+                  <Input id="bookId" value="{form>/ID}" type="Number" width="16rem"/>
+                  <Label text="书名" labelFor="insTitle"/>
+                  <Input id="insTitle" value="{form>/title}" width="16rem" submit=".onInsert"/>
+                  <Label text="作者" labelFor="insAuthor"/>
+                  <Input id="insAuthor" value="{form>/author}" width="16rem" submit=".onInsert"/>
+                  <Button text="保存" type="Emphasized" press=".onInsert" class="sapUiSmallMarginTop"/>
+                </VBox>
+              </VBox>
+            </VBox>
+          </IconTabFilter>
+        </items>
+      </IconTabBar>
+    </content>
+  </Page>
+</mvc:View>

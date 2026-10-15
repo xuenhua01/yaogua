@@ -1,0 +1,22 @@
+---
+applications:
+- name: ZXH_BTP_Template-srv
+  memory: 512M
+  buildpack: nodejs_buildpack
+  command: ./node_modules/.bin/cds-serve
+  timeout: 120
+  routes:
+  - route: zxh-btp-template-api.cfapps.ap21.hana.ondemand.com
+  services:
+  - handwrite-hdi
+  - template-xsuaa
+- name: ZXH_BTP_Template-approuter
+  path: approuter
+  memory: 256M
+  buildpack: nodejs_buildpack
+  routes:
+  - route: zxh-btp-template.cfapps.ap21.hana.ondemand.com
+  services:
+  - template-xsuaa
+  env:
+    destinations: '[{"name":"srv-api","url":"https://zxh-btp-template-api.cfapps.ap21.hana.ondemand.com","forwardAuthToken":true}]'

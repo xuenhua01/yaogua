@@ -1,0 +1,46 @@
+<mvc:View
+  controllerName="demo.controller.Materials"
+  xmlns:mvc="sap.ui.core.mvc"
+  xmlns="sap.m">
+  <Page title="物料" showNavButton="true" navButtonPress=".onNavBack">
+    <subHeader>
+      <OverflowToolbar>
+        <Input id="matnr" placeholder="物料编码" width="10rem"/>
+        <Input id="maktx" placeholder="物料描述" width="10rem"/>
+        <Input id="mtart" placeholder="物料类型" width="8rem"/>
+        <Input id="matkl" placeholder="物料组" width="8rem"/>
+        <Button text="查询" type="Emphasized" press=".onSearch"/>
+        <Button text="清空" press=".onClear"/>
+      </OverflowToolbar>
+    </subHeader>
+    <content>
+      <Table id="materialsTable" items="{/Materials}" growing="true" growingThreshold="100" updateFinished=".onUpdateFinished">
+        <headerToolbar>
+          <OverflowToolbar>
+            <Title id="matTitle" text="物料主数据"/>
+          </OverflowToolbar>
+        </headerToolbar>
+        <columns>
+          <Column><header><Text text="物料编码"/></header></Column>
+          <Column><header><Text text="物料描述"/></header></Column>
+          <Column><header><Text text="物料类型"/></header></Column>
+          <Column><header><Text text="物料组"/></header></Column>
+          <Column><header><Text text="基本单位"/></header></Column>
+          <Column><header><Text text="行业"/></header></Column>
+        </columns>
+        <items>
+          <ColumnListItem>
+            <cells>
+              <Text text="{MATNR}"/>
+              <Text text="{MAKTX}"/>
+              <Text text="{MTART}"/>
+              <Text text="{MATKL}"/>
+              <Text text="{MEINS}"/>
+              <Text text="{MBRSH}"/>
+            </cells>
+          </ColumnListItem>
+        </items>
+      </Table>
+    </content>
+  </Page>
+</mvc:View>

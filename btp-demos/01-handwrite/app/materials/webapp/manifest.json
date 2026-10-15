@@ -1,0 +1,110 @@
+{
+  "_version": "1.49.0",
+  "sap.app": {
+    "id": "materials",
+    "type": "application",
+    "title": "物料主数据",
+    "description": "Fiori Elements List Report for CatalogService.Materials",
+    "applicationVersion": {
+      "version": "1.0.0"
+    },
+    "dataSources": {
+      "mainService": {
+        "uri": "/odata/v4/catalog/",
+        "type": "OData",
+        "settings": {
+          "annotations": [],
+          "odataVersion": "4.0"
+        }
+      }
+    }
+  },
+  "sap.ui": {
+    "technology": "UI5",
+    "deviceTypes": {
+      "desktop": true,
+      "tablet": true,
+      "phone": true
+    }
+  },
+  "sap.ui5": {
+    "flexEnabled": true,
+    "dependencies": {
+      "minUI5Version": "1.120.0",
+      "libs": {
+        "sap.m": {},
+        "sap.ui.core": {},
+        "sap.fe.templates": {}
+      }
+    },
+    "models": {
+      "": {
+        "dataSource": "mainService",
+        "settings": {
+          "operationMode": "Server",
+          "autoExpandSelect": true,
+          "earlyRequests": true
+        }
+      },
+      "@i18n": {
+        "type": "sap.ui.model.resource.ResourceModel",
+        "settings": {
+          "bundleName": "materials.i18n.i18n"
+        }
+      }
+    },
+    "routing": {
+      "routes": [
+        {
+          "pattern": ":?query:",
+          "name": "MaterialsList",
+          "target": "MaterialsList"
+        },
+        {
+          "pattern": "Materials({key}):?query:",
+          "name": "MaterialsObjectPage",
+          "target": "MaterialsObjectPage"
+        }
+      ],
+      "targets": {
+        "MaterialsList": {
+          "type": "Component",
+          "id": "MaterialsList",
+          "name": "sap.fe.templates.ListReport",
+          "options": {
+            "settings": {
+              "contextPath": "/Materials",
+              "variantManagement": "Page",
+              "initialLoad": "Enabled",
+              "navigation": {
+                "Materials": {
+                  "detail": {
+                    "route": "MaterialsObjectPage"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "MaterialsObjectPage": {
+          "type": "Component",
+          "id": "MaterialsObjectPage",
+          "name": "sap.fe.templates.ObjectPage",
+          "options": {
+            "settings": {
+              "contextPath": "/Materials"
+            }
+          }
+        }
+      }
+    },
+    "contentDensities": {
+      "compact": true,
+      "cozy": true
+    }
+  },
+  "sap.fiori": {
+    "registrationIds": [],
+    "archeType": "transactional"
+  }
+}

@@ -1,0 +1,23 @@
+---
+applications:
+- name: ZXH_BTP_BooksMcp
+  path: mcp
+  memory: 256M
+  buildpack: nodejs_buildpack
+  command: npm start
+  timeout: 180
+  routes:
+  - route: zxh-btp-books-mcp.cfapps.ap21.hana.ondemand.com
+  env:
+    MCP_TOKEN: demo-books-mcp
+- name: ZXH_BTP_AgentMcp
+  path: agent
+  memory: 256M
+  buildpack: nodejs_buildpack
+  command: npm start
+  timeout: 180
+  routes:
+  - route: zxh-btp-agent-mcp.cfapps.ap21.hana.ondemand.com
+  env:
+    MCP_URL: https://zxh-btp-books-mcp.cfapps.ap21.hana.ondemand.com/mcp
+    MCP_TOKEN: demo-books-mcp

@@ -1,0 +1,56 @@
+{
+  "name": "zxh-btp-template",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@cap-js/hana": "^2.8.3",
+    "@sap/cds": "^9",
+    "@sap/xssec": "^4.15.0"
+  },
+  "devDependencies": {
+    "@cap-js/sqlite": "^2"
+  },
+  "scripts": {
+    "start": "cds-serve"
+  },
+  "cds": {
+    "requires": {
+      "auth": {
+        "[development]": {
+          "kind": "mocked",
+          "users": {
+            "viewer": {
+              "password": "viewer",
+              "roles": [
+                "BooksViewer"
+              ]
+            },
+            "editor": {
+              "password": "editor",
+              "roles": [
+                "BooksEditor"
+              ]
+            }
+          }
+        },
+        "[production]": {
+          "kind": "xsuaa"
+        }
+      },
+      "db": {
+        "kind": "sqlite",
+        "impl": "@cap-js/sqlite",
+        "credentials": {
+          "url": ":memory:"
+        },
+        "[production]": {
+          "kind": "hana",
+          "impl": "@cap-js/hana",
+          "pool": {
+            "acquireTimeoutMillis": 60000
+          }
+        }
+      }
+    }
+  }
+}

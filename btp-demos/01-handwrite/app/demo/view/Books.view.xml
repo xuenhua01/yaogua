@@ -1,0 +1,35 @@
+<mvc:View
+  controllerName="demo.controller.Books"
+  xmlns:mvc="sap.ui.core.mvc"
+  xmlns="sap.m">
+  <Page title="书籍" showNavButton="true" navButtonPress=".onNavBack">
+    <content>
+      <Table id="booksTable" items="{/Books}" growing="true" growingThreshold="50">
+        <headerToolbar>
+          <OverflowToolbar>
+            <Title text="书籍"/>
+            <ToolbarSpacer/>
+            <Button text="新建" type="Emphasized" press=".onCreate" visible="{user>/canEdit}"/>
+            <Button text="刷新" press=".onRefresh"/>
+          </OverflowToolbar>
+        </headerToolbar>
+        <columns>
+          <Column width="4rem"><header><Text text="ID"/></header></Column>
+          <Column><header><Text text="书名"/></header></Column>
+          <Column><header><Text text="作者"/></header></Column>
+          <Column width="6rem"><header><Text text=""/></header></Column>
+        </columns>
+        <items>
+          <ColumnListItem>
+            <cells>
+              <Text text="{ID}"/>
+              <Text text="{title}"/>
+              <Text text="{author}"/>
+              <Button text="编辑" press=".onEdit" visible="{user>/canEdit}"/>
+            </cells>
+          </ColumnListItem>
+        </items>
+      </Table>
+    </content>
+  </Page>
+</mvc:View>

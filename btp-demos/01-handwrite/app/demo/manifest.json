@@ -1,0 +1,73 @@
+{
+  "_version": "1.49.0",
+  "sap.app": {
+    "id": "demo",
+    "type": "application",
+    "title": "徐大侠demo合集",
+    "applicationVersion": { "version": "1.0.0" },
+    "dataSources": {
+      "mainService": {
+        "uri": "/odata/v4/catalog/",
+        "type": "OData",
+        "settings": { "odataVersion": "4.0" }
+      }
+    }
+  },
+  "sap.ui": {
+    "technology": "UI5",
+    "deviceTypes": { "desktop": true, "tablet": true, "phone": true }
+  },
+  "sap.ui5": {
+    "dependencies": {
+      "minUI5Version": "1.120.0",
+      "libs": { "sap.m": {}, "sap.ui.core": {} }
+    },
+    "rootView": {
+      "viewName": "demo.view.App",
+      "type": "XML",
+      "async": true,
+      "id": "appView"
+    },
+    "models": {
+      "": {
+        "dataSource": "mainService",
+        "preload": false,
+        "settings": {
+          "synchronizationMode": "None",
+          "operationMode": "Server",
+          "autoExpandSelect": true,
+          "updateGroupId": "$auto"
+        }
+      }
+    },
+    "routing": {
+      "config": {
+        "routerClass": "sap.m.routing.Router",
+        "viewType": "XML",
+        "viewPath": "demo.view",
+        "controlId": "app",
+        "controlAggregation": "pages",
+        "async": true
+      },
+      "routes": [
+        { "pattern": "", "name": "home", "target": "home" },
+        { "pattern": "template", "name": "template", "target": "template" },
+        { "pattern": "books", "name": "books", "target": "books" },
+        { "pattern": "materials", "name": "materials", "target": "materials" },
+        { "pattern": "books-fiori", "name": "booksFiori", "target": "booksFiori" },
+        { "pattern": "materials-fiori", "name": "materialsFiori", "target": "materialsFiori" }
+      ],
+      "targets": {
+        "home": { "viewName": "Home", "viewLevel": 0 },
+        "template": { "viewName": "Template", "viewLevel": 1 },
+        "books": { "viewName": "Books", "viewLevel": 1 },
+        "materials": { "viewName": "Materials", "viewLevel": 1 },
+        "booksFiori": { "viewName": "FioriHost", "viewId": "booksFiori", "viewLevel": 1 },
+        "materialsFiori": { "viewName": "FioriHost", "viewId": "materialsFiori", "viewLevel": 1 }
+      }
+    },
+    "resources": {
+      "css": [{ "uri": "css/style.css" }]
+    }
+  }
+}

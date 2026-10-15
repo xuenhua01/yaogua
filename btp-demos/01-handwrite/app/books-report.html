@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>书籍报表</title>
+  <style>
+    :root {
+      --bar: #fff;
+      --bg: #f4f6f8;
+      --ink: #1d2d3e;
+      --muted: #556b82;
+      --line: #d9e1e8;
+      --brand: #0070f2;
+      --card: #fff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "72", sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+    }
+    header {
+      height: 52px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 0 24px;
+      background: var(--bar);
+      border-bottom: 1px solid var(--line);
+    }
+    header a { color: var(--brand); text-decoration: none; font-size: 14px; }
+    header h1 { margin: 0; font-size: 16px; font-weight: 700; }
+    main { max-width: 960px; margin: 0 auto; padding: 24px; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 1px 2px rgba(29, 45, 62, 0.06);
+    }
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: end;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--line);
+    }
+    label { display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: var(--muted); }
+    input {
+      height: 36px;
+      min-width: 180px;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      font: inherit;
+      color: var(--ink);
+    }
+    input:focus { outline: 2px solid rgba(0, 112, 242, 0.25); border-color: var(--brand); }
+    button {
+      height: 36px;
+      padding: 0 14px;
+      border-radius: 6px;
+      border: 1px solid var(--brand);
+      background: var(--brand);
+      color: #fff;
+      font: inherit;
+      cursor: pointer;
+    }
+    .meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 20px;
+    }
+    .meta h2 { margin: 0; font-size: 16px; }
+    .count { color: var(--muted); font-size: 13px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 12px 20px; text-align: left; font-size: 14px; border-top: 1px solid var(--line); }
+    th { font-size: 12px; color: var(--muted); font-weight: 600; background: #fafbfc; }
+    td.id { width: 72px; color: var(--muted); font-variant-numeric: tabular-nums; }
+    tbody tr:hover { background: #f5f9ff; }
+    .msg { padding: 28px 20px; color: var(--muted); }
+    .err { color: #aa0808; }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="/">返回</a>
+    <h1>徐大侠demo合集 · 书籍报表</h1>
+  </header>
+  <main>
+    <section class="card">
+      <form class="filters" id="filters">
+        <label>书名或作者<input id="q" placeholder="输入关键字" /></label>
+        <button type="submit">查询</button>
+      </form>
+      <div class="meta">
+        <h2>书籍</h2>
+        <div class="count" id="count">加载中…</div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>书名</th>
+            <th>作者</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <div class="msg" id="msg" hidden></div>
+    </section>
+  </main>
+  <script>
+    function esc(value) {
+      return String(value == null ? "" : value)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+    var all = [];
+    function show(rows) {
+      var body = document.getElementById("rows");
+      var msg = document.getElementById("msg");
+      body.innerHTML = rows.map(function (row) {
+        return "<tr><td class=\"id\">" + esc(row.ID) + "</td><td>" + esc(row.title) +
+          "</td><td>" + esc(row.author) + "</td></tr>";
+      }).join("");
+      document.getElementById("count").textContent = "共 " + rows.length + " 本";
+      msg.hidden = rows.length > 0;
+      msg.className = "msg";
+      msg.textContent = rows.length ? "" : "没有符合条件的书籍";
+    }
+    function apply() {
+      var q = document.getElementById("q").value.trim().toLowerCase();
+      show(all.filter(function (row) {
+        if (!q) return true;
+        return String(row.title || "").toLowerCase().indexOf(q) >= 0 ||
+          String(row.author || "").toLowerCase().indexOf(q) >= 0;
+      }));
+    }
+    var saved = null;
+    try { saved = JSON.parse(sessionStorage.getItem("demoUser") || "null"); } catch (ignore) {}
+    var headers = {};
+    if (saved && saved.password) {
+      headers.Authorization = "Basic " + btoa(saved.id + ":" + saved.password);
+    }
+    fetch("/odata/v4/catalog/Books", { headers: headers, credentials: "same-origin" }).then(function (r) {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    }).then(function (data) {
+      all = data.value || [];
+      apply();
+    }).catch(function (e) {
+      document.getElementById("count").textContent = "加载失败";
+      var msg = document.getElementById("msg");
+      msg.hidden = false;
+      msg.className = "msg err";
+      msg.textContent = e.message;
+    });
+    document.getElementById("filters").addEventListener("submit", function (event) {
+      event.preventDefault();
+      apply();
+    });
+  </script>
+</body>
+</html>

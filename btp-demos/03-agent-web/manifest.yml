@@ -1,0 +1,9 @@
+---
+applications:
+- name: ZXH_BTP_AgentWeb
+  memory: 256M
+  buildpack: nodejs_buildpack
+  command: npm start
+  timeout: 120
+  routes:
+  - route: zxh-btp-agent.cfapps.ap21.hana.ondemand.com

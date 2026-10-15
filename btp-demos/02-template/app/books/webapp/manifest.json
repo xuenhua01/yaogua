@@ -1,0 +1,58 @@
+{
+  "_version": "1.65.0",
+  "sap.app": {
+    "id": "books",
+    "type": "application",
+    "title": "书籍",
+    "applicationVersion": {
+      "version": "1.0.0"
+    },
+    "dataSources": {
+      "catalog": {
+        "uri": "/odata/v4/catalog/",
+        "type": "OData",
+        "settings": {
+          "odataVersion": "4.0"
+        }
+      }
+    }
+  },
+  "sap.ui": {
+    "technology": "UI5",
+    "deviceTypes": {
+      "desktop": true,
+      "tablet": true,
+      "phone": true
+    }
+  },
+  "sap.ui5": {
+    "dependencies": {
+      "minUI5Version": "1.120.0",
+      "libs": {
+        "sap.m": {},
+        "sap.ui.core": {}
+      }
+    },
+    "rootView": {
+      "viewName": "books.view.Books",
+      "type": "XML",
+      "id": "booksView",
+      "async": true
+    },
+    "models": {
+      "": {
+        "dataSource": "catalog",
+        "preload": true,
+        "settings": {
+          "synchronizationMode": "None",
+          "operationMode": "Server",
+          "autoExpandSelect": true,
+          "earlyRequests": false
+        }
+      },
+      "view": {
+        "type": "sap.ui.model.json.JSONModel"
+      }
+    }
+  }
+}

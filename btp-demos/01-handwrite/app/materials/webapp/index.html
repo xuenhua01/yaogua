@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html style="height: 100%">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>物料主数据</title>
+  <style>
+    html, body, body > div, #container, #container-uiarea {
+      height: 100%;
+    }
+    html, body { margin: 0; }
+    #bootMsg {
+      font-family: Segoe UI, sans-serif;
+      padding: 24px;
+      color: #32363a;
+    }
+  </style>
+  <script
+    id="sap-ui-bootstrap"
+    src="https://ui5.sap.com/resources/sap-ui-core.js"
+    data-sap-ui-theme="sap_horizon"
+    data-sap-ui-resourceroots='{"materials": "./"}'
+    data-sap-ui-oninit="module:sap/ui/core/ComponentSupport"
+    data-sap-ui-async="true"
+    data-sap-ui-compatVersion="edge"
+    data-sap-ui-frameOptions="trusted"
+    data-sap-ui-xx-waitForTheme="true"
+    data-sap-ui-libs="sap.m,sap.fe.templates">
+  </script>
+  <script>
+    var bootWatch = setInterval(function () {
+      var el = document.getElementById("bootMsg");
+      var page = document.querySelector(".sapFDynamicPage");
+      if (page && page.getBoundingClientRect().height > 80) {
+        if (el) el.style.display = "none";
+        clearInterval(bootWatch);
+      }
+    }, 500);
+    setTimeout(function () {
+      var el = document.getElementById("bootMsg");
+      if (!el || el.style.display === "none") return;
+      el.innerHTML =
+        "UI5 加载超时。请改开简易页：<br/>" +
+        "<a href='/materials.html'>/materials.html</a>";
+    }, 45000);
+  </script>
+</head>
+<body class="sapUiBody sapUiSizeCompact" id="content" style="height: 100%">
+  <div id="bootMsg">正在加载 Fiori 物料列表，请等 10～30 秒…</div>
+  <div
+    data-sap-ui-component
+    data-name="materials"
+    data-id="container"
+    data-settings='{"id": "materials"}'
+    data-handle-validation="true"
+    style="height: 100%; display: block">
+  </div>
+</body>
+</html>

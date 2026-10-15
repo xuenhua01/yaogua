@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>物料主数据</title>
+  <script>
+    window.materialsInit = function () {
+      var oModel = new sap.ui.model.json.JSONModel({ value: [] });
+
+      function odataQuote(value) {
+        return String(value).replace(/'/g, "''");
+      }
+
+      function loadMaterials() {
+        var filters = [];
+        var matnr = oMatnr.getValue().trim();
+        var maktx = oMaktx.getValue().trim();
+        var mtart = oMtart.getValue().trim();
+        var matkl = oMatkl.getValue().trim();
+        if (matnr) filters.push("contains(MATNR,'" + odataQuote(matnr) + "')");
+        if (maktx) filters.push("contains(MAKTX,'" + odataQuote(maktx) + "')");
+        if (mtart) filters.push("MTART eq '" + odataQuote(mtart) + "'");
+        if (matkl) filters.push("contains(MATKL,'" + odataQuote(matkl) + "')");
+        var url = "/odata/v4/catalog/Materials";
+        if (filters.length) url += "?$filter=" + encodeURIComponent(filters.join(" and "));
+        fetch(url)
+          .then(function (r) {
+            if (!r.ok) throw new Error("HTTP " + r.status);
+            return r.json();
+          })
+          .then(function (data) {
+            oModel.setData(data);
+            oTitle.setText("物料主数据 (" + (data.value ? data.value.length : 0) + ")");
+          })
+          .catch(function (e) {
+            sap.m.MessageBox.error("加载失败: " + e.message);
+          });
+      }
+
+      var oMatnr = new sap.m.Input({ placeholder: "物料编码 MATNR", width: "12rem" });
+      var oMaktx = new sap.m.Input({ placeholder: "物料描述 MAKTX", width: "12rem" });
+      var oMtart = new sap.m.Input({ placeholder: "物料类型 MTART", width: "10rem" });
+      var oMatkl = new sap.m.Input({ placeholder: "物料组 MATKL", width: "10rem" });
+      var oTitle = new sap.m.Title({ text: "物料主数据" });
+
+      var oFilter = new sap.m.Toolbar({
+        content: [
+          oMatnr,
+          oMaktx,
+          oMtart,
+          oMatkl,
+          new sap.m.Button({ text: "查询", type: "Emphasized", press: loadMaterials }),
+          new sap.m.Button({
+            text: "清空",
+            press: function () {
+              oMatnr.setValue("");
+              oMaktx.setValue("");
+              oMtart.setValue("");
+              oMatkl.setValue("");
+              loadMaterials();
+            }
+          })
+        ]
+      });
+
+      var oTable = new sap.m.Table({
+        headerToolbar: new sap.m.Toolbar({
+          content: [oTitle, new sap.m.ToolbarSpacer()]
+        }),
+        columns: [
+          new sap.m.Column({ header: new sap.m.Text({ text: "物料编码" }) }),
+          new sap.m.Column({ header: new sap.m.Text({ text: "物料描述" }) }),
+          new sap.m.Column({ header: new sap.m.Text({ text: "物料类型" }) }),
+          new sap.m.Column({ header: new sap.m.Text({ text: "物料组" }) }),
+          new sap.m.Column({ header: new sap.m.Text({ text: "基本单位" }) }),
+          new sap.m.Column({ header: new sap.m.Text({ text: "行业" }) })
+        ]
+      });
+      oTable.bindItems({
+        path: "/value",
+        template: new sap.m.ColumnListItem({
+          cells: [
+            new sap.m.Text({ text: "{MATNR}" }),
+            new sap.m.Text({ text: "{MAKTX}" }),
+            new sap.m.Text({ text: "{MTART}" }),
+            new sap.m.Text({ text: "{MATKL}" }),
+            new sap.m.Text({ text: "{MEINS}" }),
+            new sap.m.Text({ text: "{MBRSH}" })
+          ]
+        })
+      });
+      oTable.setModel(oModel);
+
+      new sap.m.App({
+        pages: [
+          new sap.m.Page({
+            title: "物料主数据",
+            content: [oFilter, oTable]
+          })
+        ]
+      }).placeAt("content");
+      loadMaterials();
+    };
+  </script>
+  <script
+    id="sap-ui-bootstrap"
+    src="https://ui5.sap.com/resources/sap-ui-core.js"
+    data-sap-ui-theme="sap_horizon"
+    data-sap-ui-libs="sap.m"
+    data-sap-ui-async="true"
+    data-sap-ui-compatVersion="edge"
+    data-sap-ui-oninit="materialsInit">
+  </script>
+</head>
+<body class="sapUiBody" id="content"></body>
+</html>

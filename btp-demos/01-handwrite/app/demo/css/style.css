@@ -1,0 +1,49 @@
+.demoHome.sapMPage .sapMPageBgStandard {
+  background-color: #f5f6f7;
+}
+.demoTile {
+  width: 12.5rem;
+  height: 11rem;
+  margin: 0.5rem;
+}
+.demoTemplate .sapMPageBgStandard {
+  background: #f4f6f8;
+}
+.demoTabs {
+  background: transparent;
+}
+.demoReportWrap {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+.demoCard {
+  background: #fff;
+  border: 1px solid #d9e1e8;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(29, 45, 62, 0.06);
+  overflow: hidden;
+}
+.demoFilters {
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #d9e1e8;
+}
+.demoMeta {
+  padding: 0.875rem 1.25rem;
+}
+.demoCount {
+  color: #556b82;
+  font-size: 0.8125rem;
+}
+.demoId {
+  color: #556b82;
+}
+.demoLogin {
+  gap: 0.35rem;
+}
+.demoForm {
+  gap: 0.5rem;
+  max-width: 28rem;
+  padding: 1.25rem 1.5rem 1.5rem;
+}

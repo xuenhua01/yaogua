@@ -1,0 +1,134 @@
+<mvc:View
+  controllerName="demo.controller.Home"
+  xmlns:mvc="sap.ui.core.mvc"
+  xmlns="sap.m"
+  xmlns:core="sap.ui.core">
+  <Page title="徐大侠demo合集" class="demoHome" enableScrolling="true">
+    <content>
+      <Title text="{= ${user>/loggedIn} ? '选择一个功能' : '请先登录' }" class="sapUiSmallMargin"/>
+      <VBox visible="{= !${user>/loggedIn} }" class="sapUiSmallMarginBegin sapUiSmallMarginBottom demoLogin">
+        <Label text="账号" labelFor="userId"/>
+        <Input id="userId" placeholder="viewer 或 editor" width="16rem" submit=".onLogin"/>
+        <Label text="密码" labelFor="password"/>
+        <Input id="password" type="Password" placeholder="和账号相同" width="16rem" submit=".onLogin"/>
+        <Button text="登录" type="Emphasized" press=".onLogin" class="sapUiTinyMarginTop"/>
+      </VBox>
+      <HBox visible="{user>/loggedIn}" alignItems="Center" class="sapUiSmallMarginBegin sapUiTinyMarginBottom">
+        <Text text="{= ${user>/canEdit} ? '已登录 ' + ${user>/id} + '，可查询可插入' : ${user>/canQuery} ? '已登录 ' + ${user>/id} + '，只能查询' : '已登录 ' + ${user>/id} + '，没有可用功能' }"/>
+        <Button text="退出" press=".onLogout" class="sapUiSmallMarginBegin"/>
+      </HBox>
+      <FlexBox wrap="Wrap" alignItems="Start" class="sapUiSmallMarginBegin">
+        <GenericTile
+          class="demoTile"
+          header="报表查询"
+          subheader="按书名或作者查询"
+          visible="{user>/canQuery}"
+          press=".onTilePress"
+          frameType="OneByOne">
+          <customData>
+            <core:CustomData key="route" value="template"/>
+            <core:CustomData key="tab" value="query"/>
+          </customData>
+          <tileContent>
+            <TileContent footer="只读">
+              <content>
+                <ImageContent src="sap-icon://search"/>
+              </content>
+            </TileContent>
+          </tileContent>
+        </GenericTile>
+        <GenericTile
+          class="demoTile"
+          header="插入"
+          subheader="新增一本书"
+          visible="{user>/canEdit}"
+          press=".onTilePress"
+          frameType="OneByOne">
+          <customData>
+            <core:CustomData key="route" value="template"/>
+            <core:CustomData key="tab" value="insert"/>
+          </customData>
+          <tileContent>
+            <TileContent footer="可写入">
+              <content>
+                <ImageContent src="sap-icon://add"/>
+              </content>
+            </TileContent>
+          </tileContent>
+        </GenericTile>
+        <GenericTile
+          class="demoTile"
+          header="物料"
+          subheader="按编码和描述查询"
+          visible="{user>/canQuery}"
+          press=".onTilePress"
+          frameType="OneByOne">
+          <customData>
+            <core:CustomData key="route" value="materials"/>
+          </customData>
+          <tileContent>
+            <TileContent footer="主数据">
+              <content>
+                <ImageContent src="sap-icon://product"/>
+              </content>
+            </TileContent>
+          </tileContent>
+        </GenericTile>
+        <GenericTile
+          class="demoTile"
+          header="物料报表"
+          subheader="与物料相同的数据"
+          visible="{user>/canQuery}"
+          press=".onTilePress"
+          frameType="OneByOne">
+          <customData>
+            <core:CustomData key="route" value="/materials-report.html"/>
+          </customData>
+          <tileContent>
+            <TileContent footer="正式报表">
+              <content>
+                <ImageContent src="sap-icon://table-view"/>
+              </content>
+            </TileContent>
+          </tileContent>
+        </GenericTile>
+        <GenericTile
+          class="demoTile"
+          header="书籍"
+          subheader="编辑并保存到 HANA"
+          visible="{user>/canEdit}"
+          press=".onTilePress"
+          frameType="OneByOne">
+          <customData>
+            <core:CustomData key="route" value="books"/>
+          </customData>
+          <tileContent>
+            <TileContent footer="可编辑">
+              <content>
+                <ImageContent src="sap-icon://course-book"/>
+              </content>
+            </TileContent>
+          </tileContent>
+        </GenericTile>
+        <GenericTile
+          class="demoTile"
+          header="书籍报表"
+          subheader="与书籍相同的数据"
+          visible="{user>/canQuery}"
+          press=".onTilePress"
+          frameType="OneByOne">
+          <customData>
+            <core:CustomData key="route" value="/books-report.html"/>
+          </customData>
+          <tileContent>
+            <TileContent footer="正式报表">
+              <content>
+                <ImageContent src="sap-icon://list"/>
+              </content>
+            </TileContent>
+          </tileContent>
+        </GenericTile>
+      </FlexBox>
+    </content>
+  </Page>
+</mvc:View>

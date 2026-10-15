@@ -1,0 +1,74 @@
+{
+  "name": "ZXH_BTP_Handwrite",
+  "version": "1.0.0",
+  "dependencies": {
+    "@cap-js/hana": "^2.8.3",
+    "@cap-js/sqlite": "^2.4",
+    "@sap-cloud-sdk/connectivity": "^4.9.1",
+    "@sap-cloud-sdk/http-client": "^4.9.1",
+    "@sap-cloud-sdk/resilience": "^4.9.1",
+    "@sap/cds": "^9",
+    "@sap/cds-dk": "^9.9.6",
+    "@sap/hdi-deploy": "^5.7.0",
+    "@sap/xssec": "^4.15.0"
+  },
+  "scripts": {
+    "start": "cds-serve"
+  },
+  "private": true,
+  "cds": {
+    "requires": {
+      "auth": {
+        "kind": "dummy",
+        "[development]": {
+          "kind": "mocked",
+          "users": {
+            "viewer": {
+              "password": "viewer",
+              "roles": [
+                "BooksViewer"
+              ]
+            },
+            "editor": {
+              "password": "editor",
+              "roles": [
+                "BooksEditor"
+              ]
+            }
+          }
+        },
+        "[production]": {
+          "kind": "xsuaa"
+        }
+      },
+      "db": {
+        "kind": "sqlite",
+        "impl": "@cap-js/sqlite",
+        "credentials": {
+          "url": ":memory:"
+        },
+        "[production]": {
+          "kind": "hana",
+          "impl": "@cap-js/hana",
+          "pool": {
+            "acquireTimeoutMillis": 60000
+          }
+        }
+      },
+      "HANDWRITE_BOOKS": {
+        "kind": "odata",
+        "credentials": {
+          "destination": "HANDWRITE_BOOKS"
+        }
+      },
+      "API_PRODUCT": {
+        "kind": "odata-v2",
+        "model": "srv/s4-product",
+        "credentials": {
+          "destination": "S4H",
+          "path": "/sap/opu/odata/sap/ZAPI_PRODUCT_SRV"
+        }
+      }
+    }
+  }
+}

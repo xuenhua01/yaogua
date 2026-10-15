@@ -1,0 +1,47 @@
+<mvc:View
+  controllerName="books.controller.Books"
+  xmlns:mvc="sap.ui.core.mvc"
+  xmlns="sap.m">
+  <App id="booksApp">
+    <pages>
+      <Page id="booksPage" title="书籍">
+        <headerContent>
+          <Button id="viewerButton" text="查询账号" press=".onViewer" visible="{= !${view>/official} }" />
+          <Button id="editorButton" text="维护账号" press=".onEditor" visible="{= !${view>/official} }" />
+          <Button id="logoutButton" text="退出" press=".onLogout" visible="{view>/official}" />
+        </headerContent>
+        <content>
+          <VBox class="sapUiSmallMargin">
+            <Text id="whoText" text="{view>/who}" />
+          </VBox>
+          <Table id="booksTable" items="{path: '/Books', suspended: true}" growing="true" growingThreshold="50">
+            <headerToolbar>
+              <OverflowToolbar>
+                <Title text="书籍" />
+                <ToolbarSpacer />
+                <Button id="createButton" text="新建" type="Emphasized" press=".onCreate" visible="{view>/canEdit}" />
+                <Button id="refreshButton" text="刷新" press=".onRefresh" />
+              </OverflowToolbar>
+            </headerToolbar>
+            <columns>
+              <Column width="4rem"><header><Text text="ID" /></header></Column>
+              <Column><header><Text text="书名" /></header></Column>
+              <Column><header><Text text="作者" /></header></Column>
+              <Column width="6rem"><header><Text text="" /></header></Column>
+            </columns>
+            <items>
+              <ColumnListItem>
+                <cells>
+                  <Text text="{ID}" />
+                  <Text text="{title}" />
+                  <Text text="{author}" />
+                  <Button text="编辑" press=".onEdit" visible="{view>/canEdit}" />
+                </cells>
+              </ColumnListItem>
+            </items>
+          </Table>
+        </content>
+      </Page>
+    </pages>
+  </App>
+</mvc:View>

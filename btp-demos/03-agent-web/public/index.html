@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>书籍助手</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background: #f5f6f7;
+      color: #1d2d3e;
+    }
+    header {
+      background: #fff;
+      border-bottom: 1px solid #d9d9d9;
+      padding: 16px 24px;
+    }
+    header h1 { margin: 0; font-size: 20px; }
+    header p { margin: 6px 0 0; color: #556b82; font-size: 14px; }
+    #settings {
+      display: grid;
+      grid-template-columns: 1.4fr 1.4fr 1fr;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    main {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 86px);
+    }
+    #log {
+      flex: 1;
+      overflow: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding-bottom: 12px;
+    }
+    .msg {
+      max-width: 85%;
+      padding: 10px 14px;
+      border-radius: 8px;
+      white-space: pre-wrap;
+      line-height: 1.5;
+    }
+    .user { align-self: flex-end; background: #0070f2; color: #fff; }
+    .assistant { align-self: flex-start; background: #fff; border: 1px solid #d9d9d9; }
+    .steps { display: block; margin-top: 8px; color: #556b82; font-size: 12px; }
+    .error { align-self: flex-start; background: #ffeaf0; color: #aa0808; }
+    form { display: flex; gap: 8px; }
+    input {
+      flex: 1;
+      border: 1px solid #bcc3ca;
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-size: 15px;
+    }
+    button {
+      border: 0;
+      border-radius: 6px;
+      background: #0070f2;
+      color: #fff;
+      padding: 0 18px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+    button:disabled { opacity: 0.6; cursor: default; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>书籍助手</h1>
+    <p>用一句话查询、插入或修改。密钥由使用者自己填写，关闭页面后仍留在这台浏览器里。</p>
+  </header>
+  <main>
+    <div id="settings">
+      <input id="apiKey" type="password" placeholder="你的大模型密钥" autocomplete="off" />
+      <input id="baseUrl" placeholder="接口地址" autocomplete="off" />
+      <input id="model" placeholder="模型名" autocomplete="off" />
+    </div>
+    <div id="log"></div>
+    <form id="form">
+      <input id="text" placeholder="例如：有哪些书？把第 2 本的作者改成 enhua" autocomplete="off" />
+      <button id="send" type="submit">发送</button>
+    </form>
+  </main>
+  <script>
+    var log = document.getElementById("log");
+    var form = document.getElementById("form");
+    var text = document.getElementById("text");
+    var send = document.getElementById("send");
+    var messages = [];
+    var apiKey = document.getElementById("apiKey");
+    var baseUrl = document.getElementById("baseUrl");
+    var model = document.getElementById("model");
+
+    apiKey.value = localStorage.getItem("booksApiKey") || "";
+    baseUrl.value = localStorage.getItem("booksBaseUrl") || "https://api.deepseek.com/v1";
+    model.value = localStorage.getItem("booksModel") || "deepseek-chat";
+
+    function remember() {
+      localStorage.setItem("booksApiKey", apiKey.value.trim());
+      localStorage.setItem("booksBaseUrl", baseUrl.value.trim());
+      localStorage.setItem("booksModel", model.value.trim());
+    }
+
+    apiKey.addEventListener("input", remember);
+    baseUrl.addEventListener("input", remember);
+    model.addEventListener("input", remember);
+
+    function add(role, content, steps) {
+      var item = document.createElement("div");
+      item.className = "msg " + role;
+      item.textContent = content;
+      if (steps && steps.length) {
+        var note = document.createElement("span");
+        note.className = "steps";
+        note.textContent = steps.join(" → ");
+        item.appendChild(note);
+      }
+      log.appendChild(item);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+      var content = text.value.trim();
+      if (!content) return;
+      remember();
+      if (!apiKey.value.trim()) {
+        add("error", "请先填写你自己的大模型密钥。");
+        return;
+      }
+      text.value = "";
+      add("user", content);
+      messages.push({ role: "user", content: content });
+      send.disabled = true;
+      fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: messages,
+          apiKey: apiKey.value.trim(),
+          baseUrl: baseUrl.value.trim(),
+          model: model.value.trim()
+        })
+      }).then(function (response) {
+        return response.json().then(function (body) {
+          return { ok: response.ok, body: body };
+        });
+      }).then(function (result) {
+        if (!result.ok) {
+          add("error", result.body.error || "发送失败");
+          messages.pop();
+          return;
+        }
+        messages.push({ role: "assistant", content: result.body.reply });
+        add("assistant", result.body.reply, result.body.steps);
+      }).catch(function () {
+        messages.pop();
+        add("error", "页面没有连上助手服务");
+      }).then(function () {
+        send.disabled = false;
+        text.focus();
+      });
+    });
+  </script>
+</body>
+</html>

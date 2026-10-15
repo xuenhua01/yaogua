@@ -1,0 +1,32 @@
+# Generated manifest.yml based on template version 0.1.0
+# appName = ZXH_BTP_Handwrite
+# language=nodejs
+# multitenancy=
+---
+applications:
+# -----------------------------------------------------------------------------------
+# Backend Service
+# -----------------------------------------------------------------------------------
+- name: ZXH_BTP_Handwrite-srv
+  memory: 512M
+  buildpack: nodejs_buildpack
+  command: ./node_modules/.bin/cds deploy --to hana && ./node_modules/.bin/cds-serve
+  timeout: 300
+  routes:
+  - route: zxh-btp-handwrite-api.cfapps.ap21.hana.ondemand.com
+  services:
+  - handwrite-dest
+  - handwrite-conn
+  - handwrite-hdi
+  - handwrite-xsuaa
+- name: ZXH_BTP_Handwrite-approuter
+  path: approuter
+  memory: 256M
+  buildpack: nodejs_buildpack
+  routes:
+  - route: zxh-btp-handwrite.cfapps.ap21.hana.ondemand.com
+  services:
+  - handwrite-xsuaa
+  env:
+    destinations: '[{"name":"srv-api","url":"https://zxh-btp-handwrite-api.cfapps.ap21.hana.ondemand.com","forwardAuthToken":true}]'
+

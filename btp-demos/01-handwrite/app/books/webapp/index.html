@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html style="height: 100%">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Books</title>
+  <style>
+    html, body { height: 100%; margin: 0; }
+    #bootMsg {
+      font-family: Segoe UI, sans-serif;
+      padding: 24px;
+      color: #32363a;
+    }
+  </style>
+  <script
+    id="sap-ui-bootstrap"
+    src="https://ui5.sap.com/resources/sap-ui-core.js"
+    data-sap-ui-theme="sap_horizon"
+    data-sap-ui-resourceroots='{"books": "./"}'
+    data-sap-ui-oninit="module:sap/ui/core/ComponentSupport"
+    data-sap-ui-async="true"
+    data-sap-ui-compatVersion="edge"
+    data-sap-ui-frameOptions="trusted"
+    data-sap-ui-xx-waitForTheme="true"
+    data-sap-ui-libs="sap.m,sap.fe.templates">
+  </script>
+  <script>
+    // 若 45 秒后仍只有提示，说明 CDN/组件加载失败
+    setTimeout(function () {
+      var el = document.getElementById("bootMsg");
+      if (el && el.style.display !== "none") {
+        el.innerHTML =
+          "UI5 加载超时。请检查能否打开：<br/>" +
+          "<a href='https://ui5.sap.com/resources/sap-ui-core.js' target='_blank'>ui5.sap.com 测试</a><br/>" +
+          "或先用旧页：<a href='/books.html'>/books.html</a>";
+      }
+    }, 45000);
+  </script>
+</head>
+<body class="sapUiBody sapUiSizeCompact" id="content" style="height: 100%">
+  <div id="bootMsg">正在加载 SAP UI5 / Fiori 列表，请等 10～30 秒…<br/>若出现表格上方有「执行」，请点一次。</div>
+  <div
+    data-sap-ui-component
+    data-name="books"
+    data-id="container"
+    data-settings='{"id": "books"}'
+    data-handle-validation="true"
+    style="height: 100%">
+  </div>
+</body>
+</html>

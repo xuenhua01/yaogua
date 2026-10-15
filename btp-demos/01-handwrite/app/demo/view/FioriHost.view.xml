@@ -1,0 +1,13 @@
+<mvc:View
+  controllerName="demo.controller.FioriHost"
+  xmlns:mvc="sap.ui.core.mvc"
+  xmlns="sap.m"
+  xmlns:core="sap.ui.core"
+  displayBlock="true"
+  height="100%">
+  <Page id="hostPage" title="{view>/title}" showNavButton="true" navButtonPress=".onNavBack" enableScrolling="false">
+    <content>
+      <core:ComponentContainer id="fioriHost" height="100%" async="true"/>
+    </content>
+  </Page>
+</mvc:View>

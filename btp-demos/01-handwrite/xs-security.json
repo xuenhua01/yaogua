@@ -1,0 +1,37 @@
+{
+  "xsappname": "zxh-handwrite",
+  "tenant-mode": "dedicated",
+  "scopes": [
+    { "name": "$XSAPPNAME.BooksViewer", "description": "查询书籍" },
+    { "name": "$XSAPPNAME.BooksEditor", "description": "维护书籍" }
+  ],
+  "role-templates": [
+    {
+      "name": "BooksViewer",
+      "description": "查询书籍",
+      "scope-references": ["$XSAPPNAME.BooksViewer"]
+    },
+    {
+      "name": "BooksEditor",
+      "description": "查询并插入书籍",
+      "scope-references": ["$XSAPPNAME.BooksViewer", "$XSAPPNAME.BooksEditor"]
+    }
+  ],
+  "role-collections": [
+    {
+      "name": "Handwrite-BooksViewer",
+      "description": "徐大侠demo 查询",
+      "role-template-references": ["$XSAPPNAME.BooksViewer"]
+    },
+    {
+      "name": "Handwrite-BooksEditor",
+      "description": "徐大侠demo 维护",
+      "role-template-references": ["$XSAPPNAME.BooksEditor"]
+    }
+  ],
+  "oauth2-configuration": {
+    "redirect-uris": [
+      "https://zxh-btp-handwrite.cfapps.ap21.hana.ondemand.com/**"
+    ]
+  }
+}
